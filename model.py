@@ -19,7 +19,7 @@ def get_customer_balance(customer_id):
   # Implement the logic to fetch the customer's last balance from the BalanceDetails table
   # If the customer is not found, return 0 as the initial balance
   cursor = db.cursor()
-  balance_query = "SELECT Balance FROM BalanceDetails WHERE CustomerID = %s ORDER BY BalanceDetailsID DESC LIMIT 1"
+  balance_query = "SELECT Balance FROM balancedetails WHERE CustomerID = %s ORDER BY BalanceDetailsID DESC LIMIT 1"
   cursor.execute(balance_query, (customer_id, ))
   last_balance = cursor.fetchone()
   cursor.close()
@@ -65,7 +65,7 @@ def submit_form():
 
   cursor = db.cursor()
   # Insert data into Sales table
-  sale_query = "INSERT INTO Sales (SaleDate,CustomerID,CustomerName, PaymentStatus, TotalOrderAmount, CashPaid,CreditAmount) VALUES (%s, %s, %s,%s, %s, %s,%s)"
+  sale_query = "INSERT INTO sales (SaleDate,CustomerID,CustomerName, PaymentStatus, TotalOrderAmount, CashPaid,CreditAmount) VALUES (%s, %s, %s,%s, %s, %s,%s)"
   sale_values = (date, customer_id, customer_name, payment_status, grand_total,
                  cashpaid, credit)
   cursor.execute(sale_query, sale_values)
@@ -84,7 +84,7 @@ def submit_form():
     quantity = quantities[i]
     amount = amounts[i]
     price = prices[i]
-    details_query = "INSERT INTO SalesDetails (SaleInvoiceID,CustomerID, ProductName, Quantity, Price,Amount) VALUES (%s, %s, %s, %s, %s, %s)"
+    details_query = "INSERT INTO salesdetails (SaleInvoiceID,CustomerID, ProductName, Quantity, Price,Amount) VALUES (%s, %s, %s, %s, %s, %s)"
     details_values = (new_sale_id, customer_id, product_name, quantity, price,
                       amount)
     cursor.execute(details_query, details_values)
@@ -96,7 +96,7 @@ def submit_form():
 
     # Insert the updated balance record into the BalanceDetails table
     cursor = db.cursor()
-    balance_query = "INSERT INTO BalanceDetails (balancedate,CustomerID, CustomerName, Remark, Credit, Debit, Balance) VALUES (%s, %s, %s, %s, %s, %s,%s)"
+    balance_query = "INSERT INTO balancedetails (balancedate,CustomerID, CustomerName, Remark, Credit, Debit, Balance) VALUES (%s, %s, %s, %s, %s, %s,%s)"
     balance_values = (date, customer_id, customer_name,
                       "Credit Sale Invoice #" + str(new_sale_id), credit, 0,
                       new_balance)
@@ -180,7 +180,7 @@ def submit_balance_adjustment():
     last_balance = get_customer_balance(customer_id)
     new_balance = last_balance - amount
     # Insert the updated balance record into the BalanceDetails table with the debit remark
-    balance_query = "INSERT INTO BalanceDetails (balancedate,CustomerID, CustomerName, Remark, Credit, Debit, Balance) VALUES (%s, %s, %s, %s, %s, %s,%s)"
+    balance_query = "INSERT INTO balancedetails (balancedate,CustomerID, CustomerName, Remark, Credit, Debit, Balance) VALUES (%s, %s, %s, %s, %s, %s,%s)"
     balance_values = (date, customer_id, customer_name,
                       "Debit Adjustment - " + payment_method, 0, amount,
                       new_balance)
@@ -190,7 +190,7 @@ def submit_balance_adjustment():
     last_balance = get_customer_balance(customer_id)
     new_balance = last_balance + amount
     # Insert the updated balance record into the BalanceDetails table with the credit remark
-    balance_query = "INSERT INTO BalanceDetails (balancedate,CustomerID, CustomerName, Remark, Credit, Debit, Balance) VALUES (%s, %s, %s, %s, %s, %s,%s)"
+    balance_query = "INSERT INTO balancedetails (balancedate,CustomerID, CustomerName, Remark, Credit, Debit, Balance) VALUES (%s, %s, %s, %s, %s, %s,%s)"
     balance_values = (date, customer_id, customer_name,
                       "Credit Adjustment - " + payment_method, amount, 0,
                       new_balance)
