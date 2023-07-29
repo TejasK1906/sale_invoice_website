@@ -2,4 +2,4 @@ gunicorn
 Flask
 numpy
 pandas
-mysql
+mysql.connector
