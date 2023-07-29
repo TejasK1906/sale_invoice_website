@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html >
+<!--From https://codepen.io/frytyler/pen/EGdtg-->
+<head>
+  <meta charset="UTF-8">
+  <title>Sales Invoice Form</title>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+<div class="scroll-container">
+ <div class="login">
+    <h1>Sales Invoice Form</h1>
+    <form id="invoiceForm" action="{{ url_for('submit_form')}}" method="post">
+      <label for="date">Date:</label>
+      <input type="date" id="date" name="date" value="<?php echo date('Y-m-d'); ?>" required>
+      <br><br>
+
+      <label for="customerName">Customer Name:</label>
+      <!-- <input type="text" id="customerName" name="customerName" required> -->
+      <select id="customerName" name="customerName" required>
+        {% for customer in customers %}
+          <option value="{{ customer[0] }}">{{ customer[1] }}</option>
+        {% endfor %}
+      </select>
+      
+      <br><br>
+
+      <label for="customerId">Customer ID:</label>
+      <input type="text" id="customerId" name="customerId" required>
+      
+  
+
+      <br><br>
+  
+      <table id="productTable">
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Total</th>
+          <th>Remove</th>
+        </tr>
+        <tr>
+          <td>
+            <select class="productName" name="product[]" required>
+              {% for product in products %}
+                <option value="{{ product[0] }}">{{ product[1] }}</option>
+              {% endfor %}
+            </select>
+          </td>
+          <td><input type="number" name="quantity[]" min="1" required></td>
+          <td><input type="number" name="price[]" min="0" step="0.01" required></td>
+          <td><input type="text" name="total[]" readonly></td>
+          <td><button type="button" onclick="removeRow(this)">❌</button></td>
+        </tr>
+      </table>
+  
+      <button type="button" onclick="addRow()">Add Row</button>
+      <br><br>
+      <label for="grandTotal">Grand Total:</label>
+      <input type="text" id="grandTotal" name="grandTotal" readonly>
+      <br><br>
+  
+      <label for="paymentStatus">Payment Status:</label>
+      <select id="paymentStatus" name="paymentStatus" required onchange="togglePartialCredit()">
+        <option value="Cash">Cash</option>
+        <option value="Credit">Credit</option>
+        <option value="Partial Credit">Partial Credit</option>
+      </select>
+      <br><br>
+      
+      <!-- <div id="partialCreditAmountContainer" style="display: none;">
+        <label for="partialCreditAmount">Partial Credit Amount:</label>
+        <input type="number" id="partialCreditAmount" name="partialCreditAmount" min="0" step="0.01" required
+               placeholder="Enter partial credit amount">
+        <br><br>
+      </div> -->
+  
+      <button type="submit">Submit</button>
+
+    
+    </form>
+  </div>
+</div>
+    <script>
+
+  const customerIdInput = document.getElementById('customerId');
+    const customerNameSelect = document.getElementById('customerName');
+
+
+  // Listen for changes on the Customer Name dropdown
+  customerNameSelect.addEventListener('change', function () {
+    // Get the selected option
+    const selectedOption = this.options[this.selectedIndex];
+    // Update the Customer ID input with the value from the selected option
+    customerIdInput.value = selectedOption.value;
+  });
+
+  // Function to find the corresponding Customer Name option based on Customer ID
+  function findCustomerNameOption(customerId) {
+    return Array.from(customerNameSelect.options).find(option => option.value === customerId);
+  }
+
+  // Listen for changes on the Customer ID input
+  customerIdInput.addEventListener('input', function () {
+    // Get the entered Customer ID
+    const enteredCustomerId = this.value;
+    // Find the corresponding option in the Customer Name dropdown
+    const correspondingOption = findCustomerNameOption(enteredCustomerId);
+    if (correspondingOption) {
+      // If a corresponding option is found, update the selected option in the dropdown
+      customerNameSelect.value = enteredCustomerId;
+    }
+  });
+
+    // // Listen for changes on the Customer Name dropdown
+    // customerNameSelect.addEventListener('change', function () {
+    //   // Get the selected option
+    //   const selectedOption = this.options[this.selectedIndex];
+    //   // Update the Customer ID input with the value from the selected option
+    //   customerIdInput.value = selectedOption.value;
+    // });
+
+    // // Listen for changes on the Customer ID input
+    // customerIdInput.addEventListener('input', function () {
+    //   // Get the entered Customer ID
+    //   const enteredCustomerId = this.value;
+    //   // Find the corresponding option in the Customer Name dropdown
+    //   const correspondingOption = Array.from(customerNameSelect.options).find(
+    //     (option) => option.value === enteredCustomerId
+    //   );
+    //   if (correspondingOption) {
+    //     // If a corresponding option is found, update the selected option in the dropdown
+    //     customerNameSelect.value = enteredCustomerId;
+    //   }
+    // });
+
+      function calculateTotal(row) {
+        const quantity = parseFloat(row.querySelector('[name="quantity[]"]').value) || 0;
+        const price = parseFloat(row.querySelector('[name="price[]"]').value) || 0;
+        const total = (quantity * price).toFixed(2);
+        row.querySelector('[name="total[]"]').value = total;
+        calculateGrandTotal();
+      }
+  
+      function calculateGrandTotal() {
+        const totals = document.querySelectorAll('[name="total[]"]');
+        let grandTotal = 0;
+        totals.forEach((total) => {
+          grandTotal += parseFloat(total.value) || 0;
+        });
+        document.getElementById('grandTotal').value = grandTotal.toFixed(2);
+      }
+      
+    //   function togglePartialCredit() {
+    //   const paymentStatus = document.getElementById('paymentStatus').value;
+    //   const partialCreditAmountContainer = document.getElementById('partialCreditAmountContainer');
+    //   if (paymentStatus === 'Partial Credit') {
+    //     partialCreditAmountContainer.style.display = 'block';
+    //   } else {
+    //     partialCreditAmountContainer.style.display = 'none';
+    //   }
+    // }
+
+      function addRow() {
+        const table = document.getElementById('productTable');
+        const newRow = table.insertRow(table.rows.length);
+        newRow.innerHTML = `
+          <td>
+            <select class="productName" name="product[]" required>
+              {% for product in products %}
+                <option value="{{ product[0] }}">{{ product[1] }}</option>
+              {% endfor %}
+            </select>
+          </td>
+          <td><input type="number" name="quantity[]" min="1" required></td>
+          <td><input type="number" name="price[]" min="0" step="0.01" required></td>
+          <td><input type="text" name="total[]" readonly></td>
+          <td><button type="button" onclick="removeRow(this)">❌</button></td>
+        `;
+        document.querySelectorAll('[name="quantity[]"]').forEach((input) => {
+    input.addEventListener('input', function () {
+      calculateTotal(this.parentNode.parentNode);
+    });
+  });
+
+  document.querySelectorAll('[name="price[]"]').forEach((input) => {
+    input.addEventListener('input', function () {
+      calculateTotal(this.parentNode.parentNode);
+    });
+  });
+        
+  
+        // Attach event listeners to the new row inputs
+        newRow.querySelector('[name="quantity[]"]').addEventListener('input', function () {
+          calculateTotal(newRow);
+        });
+        newRow.querySelector('[name="price[]"]').addEventListener('input', function () {
+          calculateTotal(newRow);
+        });
+  
+        // Calculate the total for the newly added row
+        calculateTotal(newRow);
+      }
+  
+      function removeRow(button) {
+        const row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+        calculateGrandTotal();
+      }
+  
+      document.getElementById('invoiceForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        calculateGrandTotal();
+        this.submit(); // Recalculate grand total before submitting the form
+        // Code to submit the form data to the backend (explained in the next step).
+      });
+  
+      // Calculate the total and grand total for the initial row after the entire document has loaded
+      calculateTotal(document.querySelector('table tr'));
+    </script>  
+  </body>
+</html>

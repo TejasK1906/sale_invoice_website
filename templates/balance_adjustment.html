@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Balance Adjustment</title>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="login">
+    <h1>Balance Adjustment</h1>
+    <form action="/submit_balance_adjustment" method="post">
+      <label for="date">Date:</label>
+      <input type="date" id="date" name="date" value="<?php echo date('Y-m-d'); ?>" required>
+      <br><br>
+
+      <label for="customerName">Customer Name:</label>
+      <!-- <input type="text" id="customerName" name="customerName" required> -->
+      <select id="customerName" name="customerName" required>
+        {% for customer in customers %}
+          <option value="{{ customer[0] }}">{{ customer[1] }}</option>
+        {% endfor %}
+      </select>
+      
+      <br><br>
+
+      <label for="customerId">Customer ID:</label>
+      <input type="text" id="customerId" name="customerId" required>
+
+      <br><br>
+
+      <label for="transactionType">Debit or Credit:</label>
+      <select id="transactionType" name="transactionType" required>
+        <option value="Debit">Debit</option>
+        <option value="Credit">Credit</option>
+      </select>
+      <br><br>
+
+      <label for="amount">Amount:</label>
+      <input type="number" id="amount" name="amount" min="0" step="100" required>
+      <br><br>
+
+      <label for="paymentMethod">Payment Method:</label>
+      <select id="paymentMethod" name="paymentMethod" required>
+        <option value="Cash">Cash</option>
+        <option value="Online">Online</option>
+      </select>
+      <br><br>
+
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+  <script>
+
+    const customerIdInput = document.getElementById('customerId');
+      const customerNameSelect = document.getElementById('customerName');
+  
+      // Listen for changes on the Customer Name dropdown
+      customerNameSelect.addEventListener('change', function () {
+        // Get the selected option
+        const selectedOption = this.options[this.selectedIndex];
+        // Update the Customer ID input with the value from the selected option
+        customerIdInput.value = selectedOption.value;
+      });
+  
+      // Listen for changes on the Customer ID input
+      customerIdInput.addEventListener('input', function () {
+        // Get the entered Customer ID
+        const enteredCustomerId = this.value;
+        // Find the corresponding option in the Customer Name dropdown
+        const correspondingOption = Array.from(customerNameSelect.options).find(
+          (option) => option.value === enteredCustomerId
+        );
+        if (correspondingOption) {
+          // If a corresponding option is found, update the selected option in the dropdown
+          customerNameSelect.value = enteredCustomerId;
+        }
+      });
+    </script>
+</body>
+</html>
