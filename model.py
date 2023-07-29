@@ -7,12 +7,12 @@ from decimal import Decimal
 app = Flask(__name__)
 
 # Configure MySQL database connection
-# db = mysql.connector.connect(
-#   host="localhost",
-#   port=3306,  # Replace 3306 with the actual port number if different
-#   user="root",
-#   password="Tejas1906",
-#   database="shop")
+db = mysql.connector.connect(
+  host="aws.connect.psdb.cloud",
+  user="us95k0t80dwp8knssvnt",
+  password="pscale_pw_fz1tu7EglZlma069wuOFcm4XsZC103TMdZgazFLJq4N",
+  database="shop",
+  ssl_ca="/etc/ssl/cert.pem")
 
 
 def get_customer_balance(customer_id):
@@ -35,11 +35,11 @@ def home():
 def sale_invoice():
   cursor = db.cursor()
   # Fetch distinct customer names and IDs from the Customers table
-  customer_query = "SELECT DISTINCT CustomerID, CustomerName FROM Customers"
+  customer_query = "SELECT DISTINCT CustomerID, CustomerName FROM customers"
   cursor.execute(customer_query)
   customers = cursor.fetchall()
 
-  product_query = "SELECT ProductID, ProductName FROM Products"
+  product_query = "SELECT ProductID, ProductName FROM products"
   cursor.execute(product_query)
   products = cursor.fetchall()
 
@@ -134,7 +134,7 @@ def submit_new_customer():
 
   cursor = db.cursor()
   # Insert data into Customers table for the new customer
-  customer_query = "INSERT INTO Customers (CustomerName, Phone, Address, Email) VALUES (%s, %s, %s, %s)"
+  customer_query = "INSERT INTO customers (CustomerName, Phone, Address, Email) VALUES (%s, %s, %s, %s)"
   customer_values = (customer_name, phone, address, email)
   cursor.execute(customer_query, customer_values)
 
@@ -156,7 +156,7 @@ def new_customer_success():
 def balance_adjustment():
   cursor = db.cursor()
   # Fetch distinct customer names and IDs from the Customers table
-  customer_query = "SELECT DISTINCT CustomerID, CustomerName FROM Customers"
+  customer_query = "SELECT DISTINCT CustomerID, CustomerName FROM customers"
   cursor.execute(customer_query)
   customers = cursor.fetchall()
 
