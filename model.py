@@ -7,12 +7,12 @@ from decimal import Decimal
 app = Flask(__name__)
 
 # Configure MySQL database connection
-db = mysql.connector.connect(
-  host="aws.connect.psdb.cloud",
-  user="erjpcdra7nparoj0d28g",
-  password="pscale_pw_eOGCBC1sH58w81Lf2pcYqPlKhjaFVk7eKLQNyGkVova",
-  database="shop",
-  ssl_ca="/etc/ssl/cert.pem")
+# db = mysql.connector.connect(
+#   host="aws.connect.psdb.cloud",
+#   user="erjpcdra7nparoj0d28g",
+#   password="pscale_pw_eOGCBC1sH58w81Lf2pcYqPlKhjaFVk7eKLQNyGkVova",
+#   database="shop",
+#   ssl_ca="/etc/ssl/cert.pem")
 
 
 def get_customer_balance(customer_id):
