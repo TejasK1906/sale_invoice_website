@@ -9,8 +9,8 @@ app = Flask(__name__)
 # Configure MySQL database connection
 db = mysql.connector.connect(
   host="aws.connect.psdb.cloud",
-  user="aq9wx0ta7bjx84a9q3aw",
-  password="pscale_pw_oYYOLwVuVN4f8TrTba7aCvDIGxp5RD9BRoISf4uGl95",
+  user="yfrl7ip85a712bpxnia5",
+  password="pscale_pw_lrKDj7gnwQlO38txpXcyOsMmARwYHxYg2sDBPPWwyia",
   database="shop",
   ssl_ca="/etc/ssl/cert.pem")
 
